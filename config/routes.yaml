@@ -1,3 +1,4 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+products:
+    type:   rest
+    resource: App\Controller\ProductController
+    prefix: api
