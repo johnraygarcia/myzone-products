@@ -6,9 +6,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VariationValueRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class VariationValue
 {
+
+    use Timestamps;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
