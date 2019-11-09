@@ -1,4 +1,13 @@
+variations:
+    type: annotation
+    resource: App\Controller\VariationController
+    prefix: api
+
 products:
-    type:   rest
+    type: annotation
     resource: App\Controller\ProductController
     prefix: api
+
+
+    
+    

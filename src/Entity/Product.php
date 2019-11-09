@@ -1,11 +1,8 @@
-<?php // src/Entity/Product.php
+<?php
 namespace App\Entity;
-
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Variation;
-use DateTime;
 
 /**
  * @ORM\Entity
@@ -21,17 +18,17 @@ class Product {
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    public $id;
+    private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
      */
-    public $name;
+    private $name;
 
     /**
      * @ORM\Column(type="text")
      */
-    public $description;
+    private $description;
 
     /**
      * @var ArrayCollection
@@ -41,11 +38,38 @@ class Product {
      *              inverseJoinColumns={@ORM\JoinColumn(name="variation_id", referencedColumnName="id")}
      *          )
      */
-    public $variations;
+    private $variations;
+
+    /**
+     * @var Status $status
+     * @ORM\ManyToOne(targetEntity="Status")
+     * @ORM\JoinColumn(name="status", referencedColumnName="id")
+     */
+    private $status;
+
+    /**
+     * @var float $price
+     * @ORM\Column(type="float")
+     */
+    private $price;
+
+    /**
+     * @var float $rating
+     * @ORM\Column(type="float")
+     */
+    private $rating;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ProductImage", 
+     *              mappedBy="product", 
+     *              orphanRemoval=true)
+     */
+    private $images;
     
     public function __construct()
     {
         $this->variations = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
     /**
@@ -128,6 +152,79 @@ class Product {
     public function setVariations(ArrayCollection $variations)
     {
         $this->variations = $variations;
+        return $this;
+    }
+
+
+    /**
+     * Get $price
+     *
+     * @return  float
+     */ 
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * Set $price
+     *
+     * @param  float  $price  $price
+     *
+     * @return  self
+     */ 
+    public function setPrice(float $price)
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    /**
+     * Get $rating
+     *
+     * @return  float
+     */ 
+    public function getRating()
+    {
+        return $this->rating;
+    }
+
+    /**
+     * Set $rating
+     *
+     * @param  float  $rating  $rating
+     *
+     * @return  self
+     */ 
+    public function setRating(float $rating)
+    {
+        $this->rating = $rating;
+
+        return $this;
+    }
+
+    /**
+     * Get $status
+     *
+     * @return  Status
+     */ 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Set $status
+     *
+     * @param  Status  $status  $status
+     *
+     * @return  self
+     */ 
+    public function setStatus(Status $status)
+    {
+        $this->status = $status;
+
         return $this;
     }
 }

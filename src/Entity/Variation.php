@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -26,15 +25,10 @@ class Variation
     private $name;
 
     /**
-     * @var ArrayCollection $variationValues
-     * @ORM\OneToMany(targetEntity="VariationValue", mappedBy="variation")
+     * @ORM\ManyToOne(targetEntity="VariationValue")
+     * @ORM\JoinColumn(name="variation_value_id", referencedColumnName="id")
      */
-    private $variationValues;
-
-    public function __construct()
-    {
-        $this->variationValues = new ArrayCollection();
-    }
+    private $variationValue;
 
     public function getId(): ?int
     {
@@ -54,25 +48,21 @@ class Variation
     }
 
     /**
-     * Get $variationValues
-     *
-     * @return  ArrayCollection
+     * Get the value of variationValue
      */ 
-    public function getVariationValues()
+    public function getVariationValue()
     {
-        return $this->variationValues;
+        return $this->variationValue;
     }
 
     /**
-     * Set $variationValues
-     *
-     * @param  ArrayCollection  $variationValues  $variationValues
+     * Set the value of variationValue
      *
      * @return  self
      */ 
-    public function setVariationValues(ArrayCollection $variationValues)
+    public function setVariationValue($variationValue)
     {
-        $this->variationValues = $variationValues;
+        $this->variationValue = $variationValue;
 
         return $this;
     }
