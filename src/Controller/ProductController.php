@@ -142,7 +142,8 @@ class ProductController extends AbstractFOSRestController
 
         $file = $request->files->get('file');
         $productId = $request->get('id');        
-        $url = $fileUploadService->doUpload($file, $this->getParameter('uploads_dir'));
+        $filename = $fileUploadService->doUpload($file, $this->getParameter('uploads_dir'));
+        $url = $this->getParameter('static_asset_path') . $filename;
 
         $product = $this->entityManager
             ->getRepository(Product::class)
@@ -154,5 +155,7 @@ class ProductController extends AbstractFOSRestController
         $this->entityManager->persist($product);
         $this->entityManager->persist($productImage);
         $this->entityManager->flush();
+
+        return $this->view($url, Response::HTTP_CREATED);
     }
 }

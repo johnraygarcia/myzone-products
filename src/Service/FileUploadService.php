@@ -16,7 +16,7 @@ class FileUploadService {
 
         $fileName = md5(uniqid()) . "." . $file->guessExtension();
         if ($file->move($destination, $fileName)) {
-            return $destination . "/" . $fileName;
+            return $fileName;
         }
 
         throw new FileException("Cannot upload file");

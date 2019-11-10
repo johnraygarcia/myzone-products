@@ -5,7 +5,8 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     uploads_dir: '%kernel.project_dir%/public/uploads'
-
+    static_asset_path: 'http://myzone-products.local/uploads/'
+     
 services:
     # default configuration for services in *this* file
     _defaults:
