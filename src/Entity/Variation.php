@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VariationRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @ExclusionPolicy("all")
  */
 class Variation
 {
@@ -21,12 +24,14 @@ class Variation
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Expose()
      */
     private $name;
 
     /**
      * @ORM\ManyToOne(targetEntity="VariationValue")
      * @ORM\JoinColumn(name="variation_value_id", referencedColumnName="id")
+     * @Expose()
      */
     private $variationValue;
 

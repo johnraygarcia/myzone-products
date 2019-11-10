@@ -1,3 +1,6 @@
+api_login_check:
+    path: /api/login_check
+
 variations:
     type: annotation
     resource: App\Controller\VariationController

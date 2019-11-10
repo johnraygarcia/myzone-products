@@ -136,7 +136,7 @@ class ProductController extends AbstractFOSRestController
     }
 
     /**
-     * @Route("/products/{id}/images")
+     * @Route("/products/{id}/images", methods={"POST"})
      */
     public function uploadImages(Request $request, FileUploadService $fileUploadService) {
 
@@ -156,6 +156,42 @@ class ProductController extends AbstractFOSRestController
         $this->entityManager->persist($productImage);
         $this->entityManager->flush();
 
-        return $this->view($url, Response::HTTP_CREATED);
+        return $this->view(["url" => $url], Response::HTTP_CREATED);
+    }
+
+    /**
+     * Set the status of a product to deleted or active
+     *  - To set to deleted status, pass a delete=1 query param in the request
+     *  - To set to active status, ommit the delete query param in the request
+     * 
+     * @Route("/products/{id}/status", methods={"PATCH"})
+     * @param Request $request
+     */
+    function updateProductStatus(Request $request) {
+        $delete = $request->get('delete');
+        $productId = $request->get('id');
+
+        /**
+         * @var Product $product
+         */
+        $product = $this->entityManager
+            ->getReference(Product::class, $productId);
+        if ($delete==1) {
+            $status = $this->entityManager
+                ->getRepository(Status::class)->findOneBy([
+                    "name" => "deleted"
+                ]);
+            
+        } else {
+            $status = $this->entityManager
+                ->getRepository(Status::class)->findOneBy([
+                    "name" => "Active"
+                ]);
+        }
+
+        $product->setStatus($status);
+        $this->entityManager->persist($product);
+        $this->entityManager->persist($status);
+        $this->entityManager->flush();
     }
 }
