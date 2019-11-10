@@ -23,7 +23,7 @@ class ProductImage
 
     /**
      * Many features have one product. This is the owning side.
-     * @ORM\ManyToOne(targetEntity="Product", inversedBy="features")
+     * @ORM\ManyToOne(targetEntity="Product", inversedBy="images")
      * @ORM\JoinColumn(name="product_id", referencedColumnName="id")
      */
     private $product;

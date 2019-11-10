@@ -3,13 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\ProductImage;
 use App\Entity\Status;
+use App\Service\FileUploadService;
+use App\Service\ProductService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\Request;
 
 class ProductController extends AbstractFOSRestController
 {
@@ -129,5 +133,26 @@ class ProductController extends AbstractFOSRestController
         $this->entityManager->flush($productManaged);
 
         return $this->view("Product is deleted.", Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/products/{id}/images")
+     */
+    public function uploadImages(Request $request, FileUploadService $fileUploadService) {
+
+        $file = $request->files->get('file');
+        $productId = $request->get('id');        
+        $url = $fileUploadService->doUpload($file, $this->getParameter('uploads_dir'));
+
+        $product = $this->entityManager
+            ->getRepository(Product::class)
+            ->find($productId);
+        $productImage = new ProductImage();
+        $productImage->setUrl($url);
+        $productImage->setProduct($product);
+
+        $this->entityManager->persist($product);
+        $this->entityManager->persist($productImage);
+        $this->entityManager->flush();
     }
 }
