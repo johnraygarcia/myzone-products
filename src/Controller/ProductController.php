@@ -27,18 +27,31 @@ class ProductController extends AbstractFOSRestController
     }
 
     /** 
+     * Paginated list of products
+     * lastId query parameter provides hint where the next set of items will start
+     * 
      * @Route("/products", methods={"GET","HEAD"})
      */
-    public function getList() {
+    public function getList(Request $request) {
 
-        $activeStatus = $this->entityManager->getRepository(Status::class)->findOneBy(["name" => "Active"]);
+        $itemsPerPage = 5;
+        $activeStatus = $this->entityManager
+            ->getRepository(Status::class)
+            ->findOneBy(["name" => "Active"]);
 
-        return $this->view(
-            $this->entityManager
-                ->getRepository(Product::class)
-                ->findBy(["status" => $activeStatus->getId()]),  
-            Response::HTTP_OK
-        );
+        $lastId = $request->get('lastId') ?: 0;
+        $productList = $this->entityManager->createQuery('
+                SELECT p, s FROM App\Entity\Product p
+                JOIN p.status s
+                WHERE p.id > :lastId 
+                AND s.id=:statusId
+            ')
+        ->setParameter('lastId', $lastId)
+        ->setParameter('statusId', $activeStatus->getId())
+        ->setMaxResults($itemsPerPage)
+        ->getResult();
+
+        return $this->view($productList, Response::HTTP_OK);
     }
 
     /**
@@ -168,6 +181,7 @@ class ProductController extends AbstractFOSRestController
      * @param Request $request
      */
     function updateProductStatus(Request $request) {
+        
         $delete = $request->get('delete');
         $productId = $request->get('id');
 

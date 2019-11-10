@@ -3,9 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\StatusRepository")
+ * @ExclusionPolicy("all")
  */
 class Status
 {
@@ -18,6 +21,7 @@ class Status
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Expose
      */
     private $name;
 
