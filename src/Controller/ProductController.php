@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Entity\ProductImage;
 use App\Entity\Status;
 use App\Service\FileUploadService;
+use App\Service\ProductService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -24,8 +25,17 @@ class ProductController extends AbstractFOSRestController
      */
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $em) {
+    /**
+     * @var ProductService $productService
+     */
+    private $productService;
+
+    public function __construct(
+        EntityManagerInterface $em,
+        ProductService $productService
+    ) {
         $this->entityManager = $em;
+        $this->productService = $productService;
     }
 
     /** 
@@ -45,6 +55,22 @@ class ProductController extends AbstractFOSRestController
      *      in="query",
      *      type="integer",
      *      description="The value of last id to be used as offset for the next set of records"
+     * )
+     * 
+     * @SWG\Parameter(
+     *      name="sortField",
+     *      in="query",
+     *      type="string",
+     *      description="Sort by id, name, createdAt",
+     *      default="name"
+     * )
+     * 
+     * @SWG\Parameter(
+     *      name="sortOrder",
+     *      in="query",
+     *      type="string",
+     *      description="Sort list by asc=Ascending or by desc=Descending",
+     *      default="asc"
      * )
      * 
      * @SWG\Parameter( 
@@ -67,12 +93,17 @@ class ProductController extends AbstractFOSRestController
             ->findOneBy(["name" => "Active"]);
 
         $lastId = $request->get('lastId') ?: 0;
-        $productList = $this->entityManager->createQuery('
-                SELECT p, s FROM App\Entity\Product p
-                JOIN p.status s
-                WHERE p.id > :lastId 
-                AND s.id=:statusId
-            ')
+        $sortField = $request->get('sortField') ?: "name";
+        $sortOrder = $request->get('sortOrder') ?: "asc";
+        $orderBy = $this->productService->filteredOrderBy($sortField, $sortOrder);
+
+        $productList = $this->entityManager->createQuery("
+            SELECT p, s FROM App\Entity\Product p
+            JOIN p.status s
+            WHERE p.id > :lastId 
+            AND s.id=:statusId
+            {$orderBy}
+        ")
         ->setParameter('lastId', $lastId)
         ->setParameter('statusId', $activeStatus->getId())
         ->setMaxResults($itemsPerPage)
