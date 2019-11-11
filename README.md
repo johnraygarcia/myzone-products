@@ -15,6 +15,6 @@ Steps to setup project
    
 
 # API Documentation
-The api documentation can be accessed via route
+Once the app is running, the api documentation can be accessed via route
 http://127.0.0.1/api/doc
 
