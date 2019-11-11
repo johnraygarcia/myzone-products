@@ -2,7 +2,7 @@
 A Rest Api built with Symfony Framework
 
 Steps to setup project
-1. Go to your http server document directory and create a folder e.g C:/xampp/htdocs/myzone_products if using xampp on windows
+1. Go to your http server document directory and create a folder e.g C:/xampp/htdocs/myzone_products
 2. Clone the the project using command into the created folder: 
   git clone https://github.com/johnraygarcia/myzone-products.git 
 3. Run composer install to download dependencies
