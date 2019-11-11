@@ -1,5 +1,5 @@
-# myzone-products
-rest-api for myzone products
+# MyZone Products API
+A Rest Api built with Symfony Framework
 
 Steps to setup project
 1. Go to your http server document directory e.g C:/xampp/htdocs if using xampp on windows
