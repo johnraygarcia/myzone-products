@@ -43,7 +43,7 @@ class Product {
     /**
      * @var Status $status
      * @ORM\ManyToOne(targetEntity="Status")
-     * @ORM\JoinColumn(name="status", referencedColumnName="id")
+     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      */
     private $status;
 
@@ -54,10 +54,10 @@ class Product {
     private $price;
 
     /**
-     * @var float $rating
-     * @ORM\Column(type="float")
+     * @var ProductRating $productRatings
+     * @ORM\OneToMany(targetEntity="ProductRating", mappedBy="product")
      */
-    private $rating;
+    private $productRatings;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\ProductImage", 
@@ -70,6 +70,7 @@ class Product {
     {
         $this->variations = new ArrayCollection();
         $this->images = new ArrayCollection();
+        $this->productRatings = new ArrayCollection();
     }
 
     /**
@@ -181,30 +182,6 @@ class Product {
     }
 
     /**
-     * Get $rating
-     *
-     * @return  float
-     */ 
-    public function getRating()
-    {
-        return $this->rating;
-    }
-
-    /**
-     * Set $rating
-     *
-     * @param  float  $rating  $rating
-     *
-     * @return  self
-     */ 
-    public function setRating(float $rating)
-    {
-        $this->rating = $rating;
-
-        return $this;
-    }
-
-    /**
      * Get $status
      *
      * @return  Status
@@ -226,5 +203,41 @@ class Product {
         $this->status = $status;
 
         return $this;
+    }
+
+    /**
+     * Get $productRatings
+     *
+     * @return  ProductRating
+     */ 
+    public function getProductRatings()
+    {
+        return $this->productRatings;
+    }
+
+    /**
+     * Set $productRatings
+     *
+     * @param  ProductRating  $productRatings  $productRatings
+     *
+     * @return  self
+     */ 
+    public function setProductRatings(ProductRating $productRatings)
+    {
+        $this->productRatings = $productRatings;
+
+        return $this;
+    }
+
+    public function getAverage() {
+        $productRatings = $this->getProductRatings();
+
+        $count = $productRatings->count();
+        $total = 0;
+        foreach ($productRatings as $productRating) {
+            $total += $productRating->getRating();
+        }
+
+        return $total/$count;
     }
 }

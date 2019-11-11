@@ -11,6 +11,11 @@ products:
     resource: App\Controller\ProductController
     prefix: api
 
+product_rating:
+    type: annotation
+    resource: App\Controller\ProductRatingController
+    prefix: api
+
 app.swagger_ui:
     path: /api/doc
     methods: GET

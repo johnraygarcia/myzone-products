@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20191107091459 extends AbstractMigration
+final class Version20191111103527 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -22,9 +22,9 @@ final class Version20191107091459 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE variation ADD variation_value_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE variation ADD CONSTRAINT FK_629B33EADB492DBE FOREIGN KEY (variation_value_id) REFERENCES variation_value (id)');
-        $this->addSql('CREATE INDEX IDX_629B33EADB492DBE ON variation (variation_value_id)');
+        $this->addSql('ALTER TABLE product_rating ADD user_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE product_rating ADD CONSTRAINT FK_BAF56786A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_BAF56786A76ED395 ON product_rating (user_id)');
     }
 
     public function down(Schema $schema) : void
@@ -32,8 +32,8 @@ final class Version20191107091459 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE variation DROP FOREIGN KEY FK_629B33EADB492DBE');
-        $this->addSql('DROP INDEX IDX_629B33EADB492DBE ON variation');
-        $this->addSql('ALTER TABLE variation DROP variation_value_id');
+        $this->addSql('ALTER TABLE product_rating DROP FOREIGN KEY FK_BAF56786A76ED395');
+        $this->addSql('DROP INDEX UNIQ_BAF56786A76ED395 ON product_rating');
+        $this->addSql('ALTER TABLE product_rating DROP user_id');
     }
 }

@@ -6,7 +6,6 @@ use App\Entity\Product;
 use App\Entity\ProductImage;
 use App\Entity\Status;
 use App\Service\FileUploadService;
-use App\Service\ProductService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -14,6 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use Swagger\Annotations as SWG;
 
 class ProductController extends AbstractFOSRestController
 {
@@ -28,9 +30,34 @@ class ProductController extends AbstractFOSRestController
 
     /** 
      * Paginated list of products
-     * lastId query parameter provides hint where the next set of items will start
      * 
-     * @Route("/products", methods={"GET","HEAD"})
+     * @Route("/products", methods={"GET"})
+     * @SWG\Response(
+     *      response=200,
+     *      description="Returns a list of paginated products",
+     *      @SWG\Schema(
+     *          type="array",
+     *          @SWG\Items(ref=@Model(type=Product::class, groups={"full"}))
+     *      )
+     * )
+     * @SWG\Parameter(
+     *      name="lastId",
+     *      in="query",
+     *      type="integer",
+     *      description="The value of last id to be used as offset for the next set of records"
+     * )
+     * 
+     * @SWG\Parameter( 
+     *      name="Authorization", 
+     *      in="header", 
+     *      required=true, 
+     *      type="string", 
+     *      default="Bearer TOKEN", 
+     *      description="Authorization" 
+     * )
+     * 
+     * @Security(name="Bearer")
+     * @SWG\Tag(name="Products")
      */
     public function getList(Request $request) {
 
@@ -55,7 +82,24 @@ class ProductController extends AbstractFOSRestController
     }
 
     /**
+     * Get specific product by id
+     * 
      * @Route("/products/{id}", methods={"GET"})
+     * @SWG\Response(
+     *      response=200,
+     *      description="An object of type Product"
+     * )
+     * 
+     * @SWG\Parameter( 
+     *      name="Authorization", 
+     *      in="header", 
+     *      required=true, 
+     *      type="string", 
+     *      default="Bearer TOKEN", 
+     *      description="Authorization" 
+     * )
+     * @Security(name="Bearer")
+     * @SWG\Tag(name="Products")
      **/
     public function getById(int $id) {
         $product = $this->entityManager
@@ -74,11 +118,66 @@ class ProductController extends AbstractFOSRestController
     /**
      * @Route("/products", methods={"POST"})
      * @ParamConverter("product", converter="fos_rest.request_body")
+     * 
+     * @SWG\Parameter(
+     *      name="form",
+     *      in="body",
+     *      description="Product data",
+     *      @SWG\Schema(
+     *          type="object",
+     *          @SWG\Property(
+     *              type="string",
+     *              property="name",
+     *              example="My Product Name"
+     *          ),
+     *          @SWG\Property(
+     *              type="string",
+     *              property="description",
+     *              example="My Product Description"
+     *          ),
+     *          @SWG\Property(
+     *              type="float",
+     *              property="price",
+     *              example="23.32"
+     *          ),
+     *          @SWG\Property(
+     *              type="integer",
+     *              property="rating",
+     *              example="5"
+     *          )
+     *      )
+     * )
+     * 
+     * @SWG\Response(
+     *      response=201,
+     *      description="The created product object",
+     *      @Model(type=Product::class, groups={"non_senstive_data"})
+     * )
+     * 
+     * @SWG\Parameter( 
+     *      name="Authorization", 
+     *      in="header", 
+     *      required=true, 
+     *      type="string", 
+     *      default="Bearer TOKEN", 
+     *      description="Authorization" 
+     * )
+     * 
+     * @Security(name="Bearer")
+     * @SWG\Tag(name="Products")
      * @return FOS\RestBundle\View
      */
     public function create(Product $product) {
 
+        $status = $this->entityManager
+            ->getRepository(Status::class)
+            ->findOneBy(["name" => "Active"]);
+
+        $product
+            ->setStatus($status);
+
         $this->entityManager->persist($product);
+        $this->entityManager->persist($status);
         $this->entityManager->flush();
         
         return $this->view($product, Response::HTTP_CREATED);
@@ -87,6 +186,55 @@ class ProductController extends AbstractFOSRestController
     /**
      * @Route("/products", methods={"PUT"})
      * @ParamConverter("product", converter="fos_rest.request_body")
+     * @SWG\Parameter(
+     *      name="form",
+     *      in="body",
+     *      description="Product data",
+     *      @SWG\Schema(
+     *          type="object",
+     *          @SWG\Property(
+     *              type="integer",
+     *              property="id",
+     *              example="1"
+     *          ),
+     *          @SWG\Property(
+     *              type="string",
+     *              property="name",
+     *              example="My Product Name"
+     *          ),
+     *          @SWG\Property(
+     *              type="string",
+     *              property="description",
+     *              example="My Product Description"
+     *          ),
+     *          @SWG\Property(
+     *              type="float",
+     *              property="price",
+     *              example="23.32"
+     *          ),
+     *          @SWG\Property(
+     *              type="integer",
+     *              property="rating",
+     *              example="5"
+     *          )
+     *      )
+     * )
+     * 
+     * @SWG\Response(
+     *      response=201,
+     *      description="The updated product object",
+     *      @Model(type=Product::class, groups={"non_senstive_data"})
+     * )
+     * @SWG\Parameter( 
+     *      name="Authorization", 
+     *      in="header", 
+     *      required=true, 
+     *      type="string", 
+     *      default="Bearer TOKEN", 
+     *      description="Authorization" 
+     * )
+     * @Security(name="Bearer")
+     * @SWG\Tag(name="Products")
      **/
     public function update(Product $product) {
 
@@ -120,8 +268,42 @@ class ProductController extends AbstractFOSRestController
     }
 
     /**
+     * Delete a product
+     * 
      * @Route("/products", methods={"DELETE"})
      * @ParamConverter("product", converter="fos_rest.request_body")
+     * 
+     * @SWG\Parameter(
+     *      name="form",
+     *      in="body",
+     *      description="Product data to be deleted",
+     *      @SWG\Schema(
+     *          type="object",
+     *          @SWG\Property(
+     *              type="integer",
+     *              property="id",
+     *              example="1"
+     *          )
+     *      )
+     * )
+     * 
+     * @SWG\Response(
+     *          response=202,
+     *          description="Product is deleted."
+     *      )
+     * )
+     * 
+     * @SWG\Parameter( 
+     *      name="Authorization", 
+     *      in="header", 
+     *      required=true, 
+     *      type="string", 
+     *      default="Bearer TOKEN", 
+     *      description="Authorization" 
+     * )
+     * 
+     * @Security(name="Bearer")
+     * @SWG\Tag(name="Products") 
      */
     public function delete(Product $product) {
         $productManaged = $this
@@ -145,11 +327,43 @@ class ProductController extends AbstractFOSRestController
         $this->entityManager->persist($productManaged);
         $this->entityManager->flush($productManaged);
 
-        return $this->view("Product is deleted.", Response::HTTP_OK);
+        return $this->view("Product is deleted.", Response::HTTP_ACCEPTED);
     }
 
     /**
      * @Route("/products/{id}/images", methods={"POST"})
+     * 
+     * @SWG\Response(
+     *          response=202,
+     *          description="Object with link url to the created image",
+     *          @SWG\Schema(
+     *              @SWG\Property(
+     *                  type="string",
+     *                  property="url",
+     *                  example="http://myzone-products.local/uploads/81d49a3477ffaf8c6fe6c85cfc0b4971.png"
+     *          ),
+     *      )
+     * )
+     * 
+     * @SWG\Parameter( 
+     *      name="file", 
+     *      in="formData", 
+     *      required=true, 
+     *      type="file", 
+     *      description="product image" 
+     * )
+     * 
+     * @SWG\Parameter( 
+     *      name="Authorization", 
+     *      in="header", 
+     *      required=true, 
+     *      type="string", 
+     *      default="Bearer TOKEN", 
+     *      description="Authorization" 
+     * )
+     * 
+     * @Security(name="Bearer")
+     * @SWG\Tag(name="Products") 
      */
     public function uploadImages(Request $request, FileUploadService $fileUploadService) {
 
@@ -179,9 +393,36 @@ class ProductController extends AbstractFOSRestController
      * 
      * @Route("/products/{id}/status", methods={"PATCH"})
      * @param Request $request
+     * 
+     * 
+     * @SWG\Response(
+     *          response=202,
+     *          description="Product status is updated"
+     *      )
+     * )
+     * 
+     * @SWG\Parameter( 
+     *      name="id", 
+     *      in="path", 
+     *      required=true, 
+     *      type="string", 
+     *      description="Id of product to update" 
+     * )
+     * 
+     * @SWG\Parameter( 
+     *      name="Authorization", 
+     *      in="header", 
+     *      required=true, 
+     *      type="string", 
+     *      default="Bearer TOKEN", 
+     *      description="Authorization" 
+     * )
+     * 
+     * @Security(name="Bearer")
+     * @SWG\Tag(name="Products") 
      */
     function updateProductStatus(Request $request) {
-        
+
         $delete = $request->get('delete');
         $productId = $request->get('id');
 
@@ -207,5 +448,7 @@ class ProductController extends AbstractFOSRestController
         $this->entityManager->persist($product);
         $this->entityManager->persist($status);
         $this->entityManager->flush();
+
+        return $this->view("Product status is updated", Response::HTTP_ACCEPTED);
     }
 }

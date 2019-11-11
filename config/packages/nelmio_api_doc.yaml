@@ -1,12 +1,24 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: My App
-            description: This is an awesome app!
+            title: Products Api
+            description: Products Api
             version: 1.0.0
+        securityDefinitions:
+            Bearer:
+                type: apiKey
+                description: 'Value: Bearer {jwt}'
+                name: Authorization
+                in: header
+        security: 
+            - Bearer: []
+    models: 
+        use_jms: true
     areas: # to filter documented areas
-        path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
-        host_patterns:
-            - ^api\.
+        default:
+            path_patterns: [^/api(?!/doc$)]
+    
+            # - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+        #host_patterns:
+        #    - ^api\.
 

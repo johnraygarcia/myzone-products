@@ -181,8 +181,7 @@ class AppFixtures extends Fixture
         $product->setName($productArray["name"])
             ->setDescription($productArray["description"])
             ->setStatus($status)
-            ->setPrice($price)
-            ->setRating($rating);
+            ->setPrice($price);
 
         $this->manager->persist($status);
         $this->manager->persist($product);
