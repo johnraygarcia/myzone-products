@@ -13,8 +13,8 @@ Steps to setup project
 7. Run the fixture to populate the db with sample data by running command: 
    bin/console doctrine:fixtures:load
    
-   The default username/password generated for user when running the fixture is:
-   username: admin@gmail.com
+   The default username/password generated for user when running the fixture is:  
+   username: admin@gmail.com  
    password: myzone
    
 
